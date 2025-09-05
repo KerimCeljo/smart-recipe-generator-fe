@@ -238,17 +238,8 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
                   ))}
                 </div>
               ) : (
-                <div className="no-reviews-message">
-                  <div className="no-reviews-icon">⭐</div>
-                  <h4>No reviews yet</h4>
-                  <p>Be the first to review this recipe!</p>
-                  <button 
-                    onClick={() => setShowReviewModal(true)}
-                    className="add-review-btn"
-                  >
-                    <MessageSquare size={16} />
-                    Add Review
-                  </button>
+                <div className="no-reviews-simple">
+                  <p>There is no review yet</p>
                 </div>
               )}
             </>

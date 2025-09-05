@@ -1581,66 +1581,19 @@ body {
 }
 
 /* ===== NO REVIEWS MESSAGE ===== */
-.no-reviews-message {
+.no-reviews-simple {
   text-align: center;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 12px;
-  border: 2px dashed #dee2e6;
-  margin: 20px 0;
-  animation: fadeIn 0.5s ease-out;
-}
-
-.no-reviews-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  opacity: 0.6;
-  animation: float 3s ease-in-out infinite;
-}
-
-.no-reviews-message h4 {
-  color: #495057;
-  margin: 0 0 8px 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.no-reviews-message p {
+  padding: 20px;
   color: #6c757d;
-  margin: 0 0 24px 0;
-  font-size: 1rem;
-}
-
-.add-review-btn {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-  color: white;
-  border: none;
-  padding: 12px 24px;
+  font-style: italic;
+  background: #f8f9fa;
   border-radius: 8px;
+  margin: 20px 0;
+}
+
+.no-reviews-simple p {
+  margin: 0;
   font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.add-review-btn:hover {
-  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
-}
-
-.add-review-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-
-.add-review-btn svg {
-  width: 16px;
-  height: 16px;
 }
 
 /* ===== UTILITY CLASSES ===== */
