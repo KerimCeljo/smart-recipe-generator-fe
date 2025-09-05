@@ -18,6 +18,8 @@ export default function RecipeHistory({
   const [activeFilter, setActiveFilter] = useState('all')
   const [reviewCounts, setReviewCounts] = useState({})
   const [loadingReviews, setLoadingReviews] = useState(false)
+  const [loadingRecipeId, setLoadingRecipeId] = useState(null)
+  const [loadSuccess, setLoadSuccess] = useState(false)
 
   // Update filtered recipes when recipes change
   useEffect(() => {
@@ -49,6 +51,25 @@ export default function RecipeHistory({
       console.error('Failed to fetch review counts:', error)
     } finally {
       setLoadingReviews(false)
+    }
+  }
+
+  const handleLoadRecipe = async (recipe) => {
+    setLoadingRecipeId(recipe.id)
+    setLoadSuccess(false)
+    
+    try {
+      await onLoadRecipe(recipe)
+      setLoadSuccess(true)
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setLoadSuccess(false)
+      }, 3000)
+    } catch (error) {
+      console.error('Error loading recipe:', error)
+    } finally {
+      setLoadingRecipeId(null)
     }
   }
 
@@ -168,6 +189,14 @@ export default function RecipeHistory({
 
   return (
     <div className="history-section">
+      {/* Success Notification */}
+      {loadSuccess && (
+        <div className="load-success-notification">
+          <div className="success-icon">✓</div>
+          <span>Recipe loaded successfully!</span>
+        </div>
+      )}
+      
       <div className="history-header">
         <h2>Recent Recipes</h2>
         <p>Search and filter through your recipe collection</p>
@@ -286,11 +315,12 @@ export default function RecipeHistory({
 
             <div className="history-actions">
               <button 
-                onClick={() => onLoadRecipe(recipe)} 
+                onClick={() => handleLoadRecipe(recipe)} 
                 className="load-btn"
                 title="Load recipe"
+                disabled={loadingRecipeId === recipe.id}
               >
-                Load
+                {loadingRecipeId === recipe.id ? 'Loading...' : 'Load'}
               </button>
               <button 
                 onClick={() => onDeleteRecipe(recipe.id)} 
