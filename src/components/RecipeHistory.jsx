@@ -59,7 +59,16 @@ export default function RecipeHistory({
     setLoadSuccess(false)
     
     try {
-      await onLoadRecipe(recipe)
+      // Add a small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Load the recipe
+      onLoadRecipe(recipe)
+      
+      // Scroll to top to show the loaded recipe
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
+      // Show success notification
       setLoadSuccess(true)
       
       // Hide success message after 3 seconds
