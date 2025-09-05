@@ -200,41 +200,58 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
             </button>
           </div>
           
-          {reviews.length > 0 && !reviewsCollapsed && (
-            <div className="reviews-list">
-              {reviews.map((review) => (
-                <div key={review.id} className="review-item">
-                  <div className="review-header">
-                    <div className="review-rating">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          size={16}
-                          className={`star ${star <= review.rating ? 'filled' : 'empty'}`}
-                          fill={star <= review.rating ? 'currentColor' : 'none'}
-                        />
-                      ))}
-                      <span className="rating-text">{review.rating}/5</span>
+          {!reviewsCollapsed && (
+            <>
+              {reviews.length > 0 ? (
+                <div className="reviews-list">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="review-item">
+                      <div className="review-header">
+                        <div className="review-rating">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              size={16}
+                              className={`star ${star <= review.rating ? 'filled' : 'empty'}`}
+                              fill={star <= review.rating ? 'currentColor' : 'none'}
+                            />
+                          ))}
+                          <span className="rating-text">{review.rating}/5</span>
+                        </div>
+                        <div className="review-actions">
+                          <button 
+                            onClick={() => handleReviewEmail(review)}
+                            className="review-email-btn"
+                            title="Send review via email"
+                          >
+                            <Mail size={14} />
+                          </button>
+                        </div>
+                      </div>
+                      <p className="review-text">{review.reviewText}</p>
+                      <div className="review-meta">
+                        <span className="review-date">
+                          {new Date(review.reviewDate).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                    <div className="review-actions">
-                      <button 
-                        onClick={() => handleReviewEmail(review)}
-                        className="review-email-btn"
-                        title="Send review via email"
-                      >
-                        <Mail size={14} />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="review-text">{review.reviewText}</p>
-                  <div className="review-meta">
-                    <span className="review-date">
-                      {new Date(review.reviewDate).toLocaleDateString()}
-                    </span>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              ) : (
+                <div className="no-reviews-message">
+                  <div className="no-reviews-icon">⭐</div>
+                  <h4>No reviews yet</h4>
+                  <p>Be the first to review this recipe!</p>
+                  <button 
+                    onClick={() => setShowReviewModal(true)}
+                    className="add-review-btn"
+                  >
+                    <MessageSquare size={16} />
+                    Add Review
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
