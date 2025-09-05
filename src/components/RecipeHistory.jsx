@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Clock, ChefHat, Target, UtensilsCrossed, Trash2, Search, Filter } from 'lucide-react'
+import { Clock, ChefHat, Target, UtensilsCrossed, Trash2, Search, Filter, Star, MessageSquare } from 'lucide-react'
+import axios from 'axios'
+import { config } from '../config'
 
 export default function RecipeHistory({ 
   recipes, 
@@ -14,11 +16,41 @@ export default function RecipeHistory({
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredRecipes, setFilteredRecipes] = useState(recipes)
   const [activeFilter, setActiveFilter] = useState('all')
+  const [reviewCounts, setReviewCounts] = useState({})
+  const [loadingReviews, setLoadingReviews] = useState(false)
 
   // Update filtered recipes when recipes change
   useEffect(() => {
     setFilteredRecipes(recipes)
   }, [recipes])
+
+  // Fetch review counts for all recipes
+  useEffect(() => {
+    if (recipes && recipes.length > 0) {
+      fetchReviewCounts()
+    }
+  }, [recipes])
+
+  const fetchReviewCounts = async () => {
+    setLoadingReviews(true)
+    try {
+      const counts = {}
+      for (const recipe of recipes) {
+        try {
+          const response = await axios.get(`${config.API_BASE}/api/recipes/${recipe.id}/stats`)
+          counts[recipe.id] = response.data.reviewCount || 0
+        } catch (error) {
+          console.error(`Failed to fetch review count for recipe ${recipe.id}:`, error)
+          counts[recipe.id] = 0
+        }
+      }
+      setReviewCounts(counts)
+    } catch (error) {
+      console.error('Failed to fetch review counts:', error)
+    } finally {
+      setLoadingReviews(false)
+    }
+  }
 
   const handleSearch = async () => {
     if (searchTerm.trim()) {
@@ -219,6 +251,12 @@ export default function RecipeHistory({
                 <ChefHat size={14} />
                 {recipe.form.mealType}
               </span>
+              {reviewCounts[recipe.id] > 0 && (
+                <div className="review-badge">
+                  <Star size={10} />
+                  <span>{reviewCounts[recipe.id]} review{reviewCounts[recipe.id] !== 1 ? 's' : ''}</span>
+                </div>
+              )}
             </div>
 
             <div className="history-ingredients">

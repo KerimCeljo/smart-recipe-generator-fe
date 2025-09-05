@@ -1,4 +1,4 @@
-/* Modern Cookbook Design - Smart Recipe Generator */
+/* Modern Cookbook Design - Smart Recipe Generator - Updated */
 
 /* ===== GLOBAL STYLES ===== */
 * {
@@ -982,6 +982,548 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== REVIEW MODAL STYLES ===== */
+.review-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.8) 0%, rgba(192, 57, 43, 0.9) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.review-modal {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 25px;
+  padding: 0;
+  max-width: 550px;
+  width: 95%;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+  animation: reviewModalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 3px solid #e74c3c;
+  overflow: hidden;
+  position: relative;
+}
+
+.review-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #e74c3c, #f39c12, #e74c3c);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.review-modal-header {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  padding: 25px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.review-modal-header::before {
+  content: '⭐';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 3rem;
+  opacity: 0.2;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Special styling for email modal header */
+.review-modal-header.email-header::before {
+  content: '📧';
+  font-size: 2.5rem;
+  top: -5px;
+  right: -5px;
+}
+
+.review-modal-header h3 {
+  color: white;
+  font-size: 1.8rem;
+  margin: 0;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.review-modal-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.review-modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.review-modal-form {
+  padding: 35px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.review-recipe-info {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  border: 2px solid #e9ecef;
+  position: relative;
+  overflow: hidden;
+}
+
+.review-recipe-info::before {
+  content: '🍳';
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font-size: 1.5rem;
+  opacity: 0.3;
+}
+
+.review-recipe-info h4 {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.review-recipe-info p {
+  color: #6c757d;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.star-rating {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-radius: 15px;
+  border: 2px solid #f39c12;
+  position: relative;
+}
+
+.star-rating::before {
+  content: 'Rate this recipe!';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f39c12;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.star-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-button svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.star-rating svg {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+}
+
+.star-button:hover {
+  transform: scale(1.3) rotate(15deg);
+  background: rgba(255, 193, 7, 0.2);
+}
+
+.star-filled {
+  color: #ffc107;
+  filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.4));
+  animation: starGlow 0.6s ease-out;
+}
+
+.star-empty {
+  color: #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.star-empty:hover {
+  color: #ffc107;
+  transform: scale(1.2);
+}
+
+.star-rating-text {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 5px 15px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.email-modal-textarea {
+  width: 100%;
+  padding: 20px;
+  border: 3px solid #e9ecef;
+  border-radius: 15px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.email-modal-textarea:focus {
+  outline: none;
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.email-modal-char-count {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 8px;
+  text-align: right;
+  font-weight: 500;
+  background: rgba(108, 117, 125, 0.1);
+  padding: 4px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  float: right;
+}
+
+.review-preview-text {
+  margin-top: 15px;
+  padding: 15px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 12px;
+  border-left: 4px solid #2196f3;
+  position: relative;
+}
+
+.review-preview-text::before {
+  content: '"';
+  position: absolute;
+  top: -5px;
+  left: 10px;
+  font-size: 2rem;
+  color: #2196f3;
+  opacity: 0.3;
+  font-family: serif;
+}
+
+.review-preview-text p {
+  margin: 0;
+  font-style: italic;
+  color: #1565c0;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.email-modal-success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  color: #155724;
+  border: 2px solid #c3e6cb;
+  border-radius: 12px;
+  padding: 15px;
+  margin: 10px 0;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(21, 87, 36, 0.1);
+}
+
+/* ===== EMAIL MODAL INPUT STYLES ===== */
+.email-modal-input {
+  width: 100%;
+  padding: 18px 25px;
+  border: 3px solid #e9ecef;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.email-modal-input:focus {
+  outline: none;
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15), inset 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+}
+
+.email-modal-input::placeholder {
+  color: #6c757d;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.email-modal-input:hover {
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.email-modal-field {
+  margin-bottom: 25px;
+}
+
+.email-modal-label {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  gap: 8px;
+}
+
+.email-modal-label::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 30px;
+  height: 3px;
+  background: linear-gradient(90deg, #e74c3c, #f39c12);
+  border-radius: 2px;
+}
+
+.review-modal-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.email-modal-cancel {
+  flex: 1;
+  padding: 15px 25px;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.email-modal-cancel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+  background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+}
+
+.email-modal-submit {
+  flex: 1;
+  padding: 15px 25px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.email-modal-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+  background: linear-gradient(135deg, #dc3545 0%, #a71e2a 100%);
+}
+
+.email-modal-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.email-modal-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes reviewModalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-100px) scale(0.8) rotate(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes starGlow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== REVIEW BADGE ===== */
+.review-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(243, 156, 18, 0.3);
+  animation: pulse 2s infinite;
+  white-space: nowrap;
+  max-width: fit-content;
+}
+
+.review-badge svg {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* ===== COLLAPSIBLE REVIEWS ===== */
+.reviews-title-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapse-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+  transform: scale(1.1);
+}
+
+.collapse-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.reviews-list {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
   }
 }
 

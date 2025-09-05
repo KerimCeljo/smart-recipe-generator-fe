@@ -1,4 +1,4 @@
-import { Copy, Download, Share2, Trash2, Mail, Star, MessageSquare } from 'lucide-react'
+import { Copy, Download, Share2, Trash2, Mail, Star, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import axios from 'axios'
 import { config } from '../config'
@@ -15,6 +15,7 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
   const [selectedReview, setSelectedReview] = useState(null)
   const [reviews, setReviews] = useState([])
   const [reviewsLoading, setReviewsLoading] = useState(false)
+  const [reviewsCollapsed, setReviewsCollapsed] = useState(false)
 
   const copyToClipboard = async () => {
     try {
@@ -178,7 +179,18 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
       {currentRecipeId && (
         <div className="reviews-section">
           <div className="reviews-header">
-            <h4>Reviews</h4>
+            <div className="reviews-title-section">
+              <h4>Reviews</h4>
+              {reviews.length > 0 && (
+                <button 
+                  onClick={() => setReviewsCollapsed(!reviewsCollapsed)}
+                  className="collapse-btn"
+                  title={reviewsCollapsed ? 'Expand reviews' : 'Collapse reviews'}
+                >
+                  {reviewsCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                </button>
+              )}
+            </div>
             <button 
               onClick={loadReviews} 
               className="load-reviews-btn"
@@ -188,7 +200,7 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
             </button>
           </div>
           
-          {reviews.length > 0 && (
+          {reviews.length > 0 && !reviewsCollapsed && (
             <div className="reviews-list">
               {reviews.map((review) => (
                 <div key={review.id} className="review-item">

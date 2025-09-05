@@ -59,50 +59,50 @@ const ReviewEmailModal = ({ isOpen, onClose, review, recipeTitle }) => {
   if (!isOpen || !review) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Send Review via Email</h2>
+    <div className="review-modal-overlay">
+      <div className="review-modal">
+        <div className="review-modal-header email-header">
+          <h3>Send Review via Email</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="review-modal-close"
           >
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="review-modal-form">
           {/* Review Preview */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-medium text-gray-900 mb-2">{recipeTitle}</h3>
-            <div className="flex items-center mb-2">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
+          <div className="review-recipe-info">
+            <h4>{recipeTitle}</h4>
+            <div className="star-rating">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className={`star-button ${
+                    star <= review.rating ? 'star-filled' : 'star-empty'
+                  }`}
+                >
                   <Star
-                    key={star}
-                    size={16}
-                    className={`${
-                      star <= review.rating
-                        ? 'text-yellow-400'
-                        : 'text-gray-300'
-                    }`}
+                    size={20}
                     fill={star <= review.rating ? 'currentColor' : 'none'}
                   />
-                ))}
-              </div>
-              <span className="ml-2 text-sm text-gray-600">
-                {review.rating}/5 stars
-              </span>
+                </button>
+              ))}
             </div>
-            <p className="text-sm text-gray-700 line-clamp-3">
-              {review.reviewText}
+            <p className="star-rating-text">
+              {review.rating}/5 stars
             </p>
+            <div className="review-preview-text">
+              <p>"{review.reviewText}"</p>
+            </div>
           </div>
 
           {/* Email Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <Mail size={16} className="inline mr-1" />
+          <div className="email-modal-field">
+            <label className="email-modal-label">
+              <Mail size={16} />
               Email Address *
             </label>
             <input
@@ -110,14 +110,14 @@ const ReviewEmailModal = ({ isOpen, onClose, review, recipeTitle }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="recipient@example.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="email-modal-input"
               required
             />
           </div>
 
           {/* Reviewer Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="email-modal-field">
+            <label className="email-modal-label">
               Your Name (Optional)
             </label>
             <input
@@ -125,41 +125,41 @@ const ReviewEmailModal = ({ isOpen, onClose, review, recipeTitle }) => {
               value={reviewerName}
               onChange={(e) => setReviewerName(e.target.value)}
               placeholder="Your name"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="email-modal-input"
             />
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="email-modal-error">
+              <p>{error}</p>
             </div>
           )}
 
           {/* Success Message */}
           {success && (
-            <div className="bg-green-50 border border-green-200 rounded-md p-3">
-              <p className="text-sm text-green-600">{success}</p>
+            <div className="email-modal-success">
+              <p>{success}</p>
             </div>
           )}
 
           {/* Submit Button */}
-          <div className="flex space-x-3 pt-4">
+          <div className="review-modal-actions">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="email-modal-cancel"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !email.trim()}
-              className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              className="email-modal-submit"
             >
               {isSubmitting ? (
                 <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="email-modal-spinner"></div>
                   Sending...
                 </div>
               ) : (

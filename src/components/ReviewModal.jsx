@@ -61,39 +61,37 @@ const ReviewModal = ({ isOpen, onClose, recipeId, recipeTitle, onReviewSubmitted
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Review Recipe</h2>
+    <div className="review-modal-overlay">
+      <div className="review-modal">
+        <div className="review-modal-header">
+          <h3>Review Recipe</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="review-modal-close"
           >
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{recipeTitle}</h3>
-            <p className="text-sm text-gray-600">Share your thoughts about this recipe</p>
+        <form onSubmit={handleSubmit} className="review-modal-form">
+          <div className="review-recipe-info">
+            <h4>{recipeTitle}</h4>
+            <p>Share your thoughts about this recipe</p>
           </div>
 
           {/* Rating */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="email-modal-field">
+            <label className="email-modal-label">
               Rating *
             </label>
-            <div className="flex space-x-1">
+            <div className="star-rating">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   type="button"
                   onClick={() => handleStarClick(star)}
-                  className={`p-1 transition-colors ${
-                    star <= rating
-                      ? 'text-yellow-400 hover:text-yellow-500'
-                      : 'text-gray-300 hover:text-yellow-400'
+                  className={`star-button ${
+                    star <= rating ? 'star-filled' : 'star-empty'
                   }`}
                 >
                   <Star size={24} fill={star <= rating ? 'currentColor' : 'none'} />
@@ -101,33 +99,33 @@ const ReviewModal = ({ isOpen, onClose, recipeId, recipeTitle, onReviewSubmitted
               ))}
             </div>
             {rating > 0 && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="star-rating-text">
                 {rating} star{rating !== 1 ? 's' : ''} out of 5
               </p>
             )}
           </div>
 
           {/* Review Text */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="email-modal-field">
+            <label className="email-modal-label">
               Your Review *
             </label>
             <textarea
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="Tell us about your experience with this recipe..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+              className="email-modal-textarea"
               rows={4}
               maxLength={1000}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="email-modal-char-count">
               {reviewText.length}/1000 characters
             </p>
           </div>
 
           {/* Review Date */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="email-modal-field">
+            <label className="email-modal-label">
               <Calendar size={16} className="inline mr-1" />
               Review Date
             </label>
@@ -135,34 +133,34 @@ const ReviewModal = ({ isOpen, onClose, recipeId, recipeTitle, onReviewSubmitted
               type="date"
               value={reviewDate}
               onChange={(e) => setReviewDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="email-modal-input"
             />
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="email-modal-error">
+              <p>{error}</p>
             </div>
           )}
 
           {/* Submit Button */}
-          <div className="flex space-x-3 pt-4">
+          <div className="review-modal-actions">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="email-modal-cancel"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !reviewText.trim() || rating === 0}
-              className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              className="email-modal-submit"
             >
               {isSubmitting ? (
                 <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="email-modal-spinner"></div>
                   Submitting...
                 </div>
               ) : (
