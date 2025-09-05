@@ -1,13 +1,20 @@
-import { Copy, Download, Share2, Trash2, Mail } from 'lucide-react'
+import { Copy, Download, Share2, Trash2, Mail, Star, MessageSquare } from 'lucide-react'
 import { useState } from 'react'
 import axios from 'axios'
 import { config } from '../config'
+import ReviewModal from './ReviewModal'
+import ReviewEmailModal from './ReviewEmailModal'
 
-export default function RecipeDisplay({ recipe, loading, error, onDelete, currentRecipeId }) {
+export default function RecipeDisplay({ recipe, loading, error, onDelete, currentRecipeId, recipeTitle = 'Generated Recipe' }) {
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [email, setEmail] = useState('')
   const [emailLoading, setEmailLoading] = useState(false)
   const [emailMessage, setEmailMessage] = useState('')
+  const [showReviewModal, setShowReviewModal] = useState(false)
+  const [showReviewEmailModal, setShowReviewEmailModal] = useState(false)
+  const [selectedReview, setSelectedReview] = useState(null)
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
 
   const copyToClipboard = async () => {
     try {
@@ -49,7 +56,7 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
       const response = await axios.post(`${config.API_BASE}/api/recipes/send-email`, {
         email: email.trim(),
         recipeContent: recipe,
-        recipeTitle: 'Your Generated Recipe'
+        recipeTitle: recipeTitle
       })
 
       setEmailMessage('✅ Recipe sent successfully!')
@@ -64,6 +71,30 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
     } finally {
       setEmailLoading(false)
     }
+  }
+
+  const handleReviewSubmitted = (newReview) => {
+    setReviews(prev => [newReview, ...prev])
+    setShowReviewModal(false)
+  }
+
+  const loadReviews = async () => {
+    if (!currentRecipeId) return
+    
+    setReviewsLoading(true)
+    try {
+      const response = await axios.get(`${config.API_BASE}/api/recipes/${currentRecipeId}/reviews`)
+      setReviews(response.data)
+    } catch (err) {
+      console.error('Error loading reviews:', err)
+    } finally {
+      setReviewsLoading(false)
+    }
+  }
+
+  const handleReviewEmail = (review) => {
+    setSelectedReview(review)
+    setShowReviewEmailModal(true)
   }
 
   if (loading) {
@@ -118,6 +149,16 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
           </button>
           {currentRecipeId && (
             <button 
+              onClick={() => setShowReviewModal(true)} 
+              className="action-btn" 
+              title="Review this recipe"
+              style={{ color: '#f59e0b' }}
+            >
+              <Star size={16} />
+            </button>
+          )}
+          {currentRecipeId && (
+            <button 
               onClick={handleDelete} 
               className="action-btn delete-btn" 
               title="Delete recipe"
@@ -132,6 +173,59 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
       <div className="recipe-content">
         {recipe}
       </div>
+
+      {/* Reviews Section */}
+      {currentRecipeId && (
+        <div className="reviews-section">
+          <div className="reviews-header">
+            <h4>Reviews</h4>
+            <button 
+              onClick={loadReviews} 
+              className="load-reviews-btn"
+              disabled={reviewsLoading}
+            >
+              {reviewsLoading ? 'Loading...' : 'Load Reviews'}
+            </button>
+          </div>
+          
+          {reviews.length > 0 && (
+            <div className="reviews-list">
+              {reviews.map((review) => (
+                <div key={review.id} className="review-item">
+                  <div className="review-header">
+                    <div className="review-rating">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          size={16}
+                          className={`star ${star <= review.rating ? 'filled' : 'empty'}`}
+                          fill={star <= review.rating ? 'currentColor' : 'none'}
+                        />
+                      ))}
+                      <span className="rating-text">{review.rating}/5</span>
+                    </div>
+                    <div className="review-actions">
+                      <button 
+                        onClick={() => handleReviewEmail(review)}
+                        className="review-email-btn"
+                        title="Send review via email"
+                      >
+                        <Mail size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="review-text">{review.reviewText}</p>
+                  <div className="review-meta">
+                    <span className="review-date">
+                      {new Date(review.reviewDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Email Modal */}
       {showEmailModal && (
@@ -172,6 +266,23 @@ export default function RecipeDisplay({ recipe, loading, error, onDelete, curren
           </div>
         </div>
       )}
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        recipeId={currentRecipeId}
+        recipeTitle={recipeTitle}
+        onReviewSubmitted={handleReviewSubmitted}
+      />
+
+      {/* Review Email Modal */}
+      <ReviewEmailModal
+        isOpen={showReviewEmailModal}
+        onClose={() => setShowReviewEmailModal(false)}
+        review={selectedReview}
+        recipeTitle={recipeTitle}
+      />
     </div>
   )
 }
