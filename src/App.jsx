@@ -26,40 +26,53 @@ export default function App() {
     }
   }, [userEmail])
 
-  // Load logged meals from localStorage on component mount
+  // Load logged meals from database when user logs in
   useEffect(() => {
-    const savedLoggedMeals = localStorage.getItem('loggedMeals')
-    if (savedLoggedMeals) {
-      setLoggedMeals(JSON.parse(savedLoggedMeals))
+    if (userEmail) {
+      loadLoggedMeals()
     }
-  }, [])
+  }, [userEmail])
+
+  const loadLoggedMeals = async () => {
+    try {
+      const response = await axios.get(`${config.API_BASE}/api/recipes/logged-meals/user/${encodeURIComponent(userEmail)}`)
+      setLoggedMeals(response.data)
+    } catch (err) {
+      console.error('Error loading logged meals:', err)
+      setLoggedMeals([])
+    }
+  }
 
   const handleLogin = (email) => {
     setUserEmail(email)
     setShowLoginModal(false)
   }
 
-  const handleLogMeal = (recipe) => {
-    const newLoggedMeal = {
-      recipeTitle: extractRecipeTitle(recipe.content),
-      ingredients: recipe.form.ingredients,
-      cookingTime: recipe.form.cookingTime,
-      content: recipe.content,
-      loggedAt: new Date().toISOString(),
-      userEmail: userEmail
-    }
+  const handleLogMeal = async (recipe) => {
+    try {
+      const loggedMealData = {
+        userEmail: userEmail,
+        recipeTitle: extractRecipeTitle(recipe.content),
+        ingredients: recipe.form.ingredients,
+        cookingTime: recipe.form.cookingTime,
+        content: recipe.content,
+        loggedAt: new Date().toISOString()
+      }
 
-    const updatedLoggedMeals = [newLoggedMeal, ...loggedMeals]
-    setLoggedMeals(updatedLoggedMeals)
-    
-    // Save to localStorage
-    localStorage.setItem('loggedMeals', JSON.stringify(updatedLoggedMeals))
-    
-    // Show success notification
-    setShowLogSuccess(true)
-    setTimeout(() => {
-      setShowLogSuccess(false)
-    }, 3000)
+      const response = await axios.post(`${config.API_BASE}/api/recipes/logged-meals`, loggedMealData)
+      
+      // Reload logged meals from database
+      await loadLoggedMeals()
+      
+      // Show success notification
+      setShowLogSuccess(true)
+      setTimeout(() => {
+        setShowLogSuccess(false)
+      }, 3000)
+    } catch (err) {
+      console.error('Error logging meal:', err)
+      setError('Failed to log meal. Please try again.')
+    }
   }
 
   const extractRecipeTitle = (content) => {
