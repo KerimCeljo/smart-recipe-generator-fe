@@ -4,6 +4,8 @@ import { config } from './config.js'
 import RecipeForm from './components/RecipeForm'
 import RecipeDisplay from './components/RecipeDisplay'
 import RecipeHistory from './components/RecipeHistory'
+import LoginModal from './components/LoginModal'
+import LoggedMeals from './components/LoggedMeals'
 
 export default function App() {
   const [loading, setLoading] = useState(false)
@@ -12,11 +14,67 @@ export default function App() {
   const [recipeHistory, setRecipeHistory] = useState([])
   const [userRecipes, setUserRecipes] = useState([])
   const [userRequests, setUserRequests] = useState([])
+  const [showLoginModal, setShowLoginModal] = useState(true)
+  const [userEmail, setUserEmail] = useState('')
+  const [loggedMeals, setLoggedMeals] = useState([])
+  const [showLogSuccess, setShowLogSuccess] = useState(false)
 
   // Load user's recipe history on component mount
   useEffect(() => {
-    loadUserData()
+    if (userEmail) {
+      loadUserData()
+    }
+  }, [userEmail])
+
+  // Load logged meals from localStorage on component mount
+  useEffect(() => {
+    const savedLoggedMeals = localStorage.getItem('loggedMeals')
+    if (savedLoggedMeals) {
+      setLoggedMeals(JSON.parse(savedLoggedMeals))
+    }
   }, [])
+
+  const handleLogin = (email) => {
+    setUserEmail(email)
+    setShowLoginModal(false)
+  }
+
+  const handleLogMeal = (recipe) => {
+    const newLoggedMeal = {
+      recipeTitle: extractRecipeTitle(recipe.content),
+      ingredients: recipe.form.ingredients,
+      cookingTime: recipe.form.cookingTime,
+      content: recipe.content,
+      loggedAt: new Date().toISOString(),
+      userEmail: userEmail
+    }
+
+    const updatedLoggedMeals = [newLoggedMeal, ...loggedMeals]
+    setLoggedMeals(updatedLoggedMeals)
+    
+    // Save to localStorage
+    localStorage.setItem('loggedMeals', JSON.stringify(updatedLoggedMeals))
+    
+    // Show success notification
+    setShowLogSuccess(true)
+    setTimeout(() => {
+      setShowLogSuccess(false)
+    }, 3000)
+  }
+
+  const extractRecipeTitle = (content) => {
+    if (!content || content.isEmpty) {
+      return 'Untitled Recipe'
+    }
+    
+    const lines = content.split('\n')
+    if (lines.length > 0) {
+      const firstLine = lines[0].trim()
+      return firstLine.replaceAll('🍳\\s*', '').replaceAll('\\s+RECIPE$', '')
+    }
+    
+    return 'Untitled Recipe'
+  }
 
   const loadUserData = async () => {
     try {
@@ -246,8 +304,27 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onLogin={handleLogin} 
+      />
+
+      {/* Success Notification */}
+      {showLogSuccess && (
+        <div className="log-success-notification">
+          <div className="log-success-icon">✓</div>
+          <span>You successfully logged that meal!</span>
+        </div>
+      )}
+
       <header className="app-header">
         <h1>🍳 Smart Recipe Generator</h1>
+        {userEmail && (
+          <div className="user-info">
+            <span>Welcome, {userEmail}</span>
+          </div>
+        )}
       </header>
 
       <main className="main-content">
@@ -262,8 +339,9 @@ export default function App() {
             error={error}
             onDelete={deleteRecipe}
             currentRecipeId={recipeHistory.find(r => r.content === currentRecipe)?.id}
+            recipeTitle={extractRecipeTitle(currentRecipe)}
           />
-      </div>
+        </div>
 
         <div className="history-section">
           <RecipeHistory 
@@ -275,8 +353,18 @@ export default function App() {
             filterByCuisine={filterRecipesByCuisine}
             filterByComplexity={filterRecipesByComplexity}
             filterByCookingTime={filterRecipesByCookingTime}
+            userEmail={userEmail}
+            onLogMeal={handleLogMeal}
           />
-      </div>
+        </div>
+
+        {/* Logged Meals Section */}
+        {userEmail && (
+          <LoggedMeals 
+            loggedMeals={loggedMeals} 
+            userEmail={userEmail} 
+          />
+        )}
       </main>
     </div>
   )

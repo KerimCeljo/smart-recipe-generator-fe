@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, ChefHat, Target, UtensilsCrossed, Trash2, Search, Filter, Star, MessageSquare } from 'lucide-react'
+import { Clock, ChefHat, Target, UtensilsCrossed, Trash2, Search, Filter, Star, MessageSquare, LogIn } from 'lucide-react'
 import axios from 'axios'
 import { config } from '../config'
 
@@ -11,7 +11,9 @@ export default function RecipeHistory({
   filterByMealType,
   filterByCuisine,
   filterByComplexity,
-  filterByCookingTime
+  filterByCookingTime,
+  userEmail,
+  onLogMeal
 }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredRecipes, setFilteredRecipes] = useState(recipes)
@@ -20,6 +22,7 @@ export default function RecipeHistory({
   const [loadingReviews, setLoadingReviews] = useState(false)
   const [loadingRecipeId, setLoadingRecipeId] = useState(null)
   const [loadSuccess, setLoadSuccess] = useState(false)
+  const [loggingMealId, setLoggingMealId] = useState(null)
 
   // Update filtered recipes when recipes change
   useEffect(() => {
@@ -79,6 +82,28 @@ export default function RecipeHistory({
       console.error('Error loading recipe:', error)
     } finally {
       setLoadingRecipeId(null)
+    }
+  }
+
+  const handleLogMeal = async (recipe) => {
+    if (!userEmail) {
+      alert('Please log in first to log meals')
+      return
+    }
+
+    setLoggingMealId(recipe.id)
+    
+    try {
+      // Add a small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 800))
+      
+      // Call the onLogMeal callback
+      onLogMeal(recipe)
+      
+    } catch (error) {
+      console.error('Error logging meal:', error)
+    } finally {
+      setLoggingMealId(null)
     }
   }
 
@@ -322,23 +347,32 @@ export default function RecipeHistory({
               {recipe.content.substring(0, 100)}...
             </div>
 
-            <div className="history-actions">
-              <button 
-                onClick={() => handleLoadRecipe(recipe)} 
-                className="load-btn"
-                title="Load recipe"
-                disabled={loadingRecipeId === recipe.id}
-              >
-                {loadingRecipeId === recipe.id ? 'Loading...' : 'Load'}
-              </button>
-              <button 
-                onClick={() => onDeleteRecipe(recipe.id)} 
-                className="delete-btn"
-                title="Delete recipe"
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
+                   <div className="history-actions">
+                     <button 
+                       onClick={() => handleLoadRecipe(recipe)} 
+                       className="load-btn"
+                       title="Load recipe"
+                       disabled={loadingRecipeId === recipe.id}
+                     >
+                       {loadingRecipeId === recipe.id ? 'Loading...' : 'Load'}
+                     </button>
+                     <button 
+                       onClick={() => handleLogMeal(recipe)} 
+                       className="log-meal-btn"
+                       title="Log this meal"
+                       disabled={loggingMealId === recipe.id}
+                     >
+                       <LogIn size={14} />
+                       {loggingMealId === recipe.id ? 'Logging...' : 'LogMeal'}
+                     </button>
+                     <button 
+                       onClick={() => onDeleteRecipe(recipe.id)} 
+                       className="delete-btn"
+                       title="Delete recipe"
+                     >
+                       <Trash2 size={14} />
+                     </button>
+                   </div>
           </div>
         ))}
       </div>
